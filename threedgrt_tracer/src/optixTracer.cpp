@@ -361,7 +361,7 @@ void OptixTracer::createPipeline(const OptixDeviceContext context,
                                          (const char**)&log, extra_includes);
         size_t sizeof_log = sizeof(log);
 
-        OPTIX_CHECK_LOG(optixModuleCreateFromPTX(
+        OPTIX_CHECK_LOG(optixModuleCreate(
             context, &module_compile_options, &pipeline_compile_options, input, inputSize, log, &sizeof_log, module));
 
         if (!(flags & PipelineFlag_HasIS) && (flags & PipelineFlag_SpherePrim)) {
@@ -440,7 +440,6 @@ void OptixTracer::createPipeline(const OptixDeviceContext context,
 
         OptixPipelineLinkOptions pipeline_link_options = {};
         pipeline_link_options.maxTraceDepth            = max_trace_depth;
-        pipeline_link_options.debugLevel               = OPTIX_COMPILE_DEBUG_LEVEL_DEFAULT;
         size_t sizeof_log                              = sizeof(log);
         OPTIX_CHECK_LOG(optixPipelineCreate(context, &pipeline_compile_options, &pipeline_link_options,
                                             program_groups.data(), static_cast<unsigned int>(program_groups.size()),
@@ -448,7 +447,7 @@ void OptixTracer::createPipeline(const OptixDeviceContext context,
 
         OptixStackSizes stack_sizes = {};
         for (auto& prog_group : program_groups) {
-            OPTIX_CHECK(optixUtilAccumulateStackSizes(prog_group, &stack_sizes));
+            OPTIX_CHECK(optixUtilAccumulateStackSizes(prog_group, &stack_sizes, *pipeline));
         }
 
         uint32_t direct_callable_stack_size_from_traversal;
