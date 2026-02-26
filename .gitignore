@@ -3,7 +3,6 @@
 .polyscope.ini
 
 external/
-runs/
 extra_info/
 wandb/
 outputs/
